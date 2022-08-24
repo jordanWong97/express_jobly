@@ -96,9 +96,9 @@ describe("GET /companies", function () {
     });
   });
 
-  test("valid query headers for filter", async function () {
-
-    const resp = await request(app).get("/companies?name=C2");
+  //TODO: update .get().query();
+  test("valid query keys for filter", async function () {
+    const resp = await request(app).get("/companies?nameLike=C2");
     expect(resp.body).toEqual({
       companies: [{
         handle: "c2",
@@ -111,8 +111,7 @@ describe("GET /companies", function () {
     });
   });
 
-  test("invalid query headers for filter", async function () {
-
+  test("invalid query keys for filter", async function () {
     const resp = await request(app).get("/companies?username=C2");
     expect(resp.status).toEqual(400);
     expect(resp.body.error).toBeTruthy();

@@ -52,7 +52,13 @@ router.post("/", ensureLoggedIn, async function (req, res, next) {
  */
 
 router.get("/", async function (req, res, next) {
-  //TODO: how to convert strings of nums to nums before validation
+  
+  //TODO: how to convert strings of nums to nums before validation?
+  //FIXME:
+  if (parseInt(minEmployees) > parseInt(maxEmployees)) {
+    throw new BadRequestError("minEmployees cannot be greater than maxEmployees!");
+  }
+
   const result = jsonschema.validate(
     req.query, companyFilterSchema, { required: true });
 

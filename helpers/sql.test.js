@@ -35,11 +35,13 @@ describe("createToken", function () {
       isAdmin: "is_admin",
     };
 
+    //TODO: use try/catch to test for specific error
     expect(() => sqlForPartialUpdate(data, columns)).toThrow(Error);
 
   });
 
   //TODO: pass in partial data
+  
 });
 
 

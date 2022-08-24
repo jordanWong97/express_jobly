@@ -87,7 +87,7 @@ describe("findAll", function () {
   });
 
   test("works: with filter", async function () {
-    const company = await Company.findAll({ name: "C2" });
+    const company = await Company.findAll({ nameLike: "C2" });
     expect(company).toEqual([{
       handle: "c2",
       name: "C2",
@@ -104,7 +104,7 @@ describe("findAll", function () {
 
   test("works: with all filter", async function () {
     const company = await Company.findAll({
-      name: 'c1',
+      nameLike: 'c1',
       minEmployees: 1,
       maxEmployees: 3
     });
@@ -144,6 +144,7 @@ describe("findAll", function () {
     }]);
   });
 
+  //TODO: move to routes
   test("invalid: min is greater than max", async function () {
     try {
       await Company.findAll({ minEmployees: 10, maxEmployees: 5 });

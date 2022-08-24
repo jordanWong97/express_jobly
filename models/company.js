@@ -49,13 +49,11 @@ class Company {
     return company;
   }
 
-  /** Find all companies.
+  /** Find all companies that match query data.
+   *  If no query data is provided, defaults to find all companies.
    *
    * Returns [{ handle, name, description, numEmployees, logoUrl }, ...]
    * */
-
-  //TODO: Write new tests for update filter functionality.
-  //TODO: Update docstring.
 
   static async findAll(queryData={}) {
 
