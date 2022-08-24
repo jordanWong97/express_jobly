@@ -11,6 +11,7 @@ const Company = require("../models/company");
 
 const companyNewSchema = require("../schemas/companyNew.json");
 const companyUpdateSchema = require("../schemas/companyUpdate.json");
+const companyFilterSchema = require("../schemas/companyFilter.json");
 
 const router = new express.Router();
 
@@ -51,6 +52,14 @@ router.post("/", ensureLoggedIn, async function (req, res, next) {
  */
 
 router.get("/", async function (req, res, next) {
+  //TODO: how to convert strings of nums to nums before validation
+  const result = jsonschema.validate(
+    req.query, companyFilterSchema, { required: true });
+
+  if (!result.valid) {
+    const errs = result.errors.map(err => err.stack);
+    throw new BadRequestError(errs);
+  }
 
   const companies = await Company.findAll(req.query);
   return res.json({ companies });
