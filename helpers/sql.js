@@ -24,4 +24,52 @@ function sqlForPartialUpdate(dataToUpdate, jsToSql) {
   };
 }
 
-module.exports = { sqlForPartialUpdate };
+
+/** TODO: Docstring */
+
+function sqlForCompanyFilter(queryData) {
+  
+  const keys = Object.keys(queryData);
+  if (keys.length === 0) return {whereClause: '', values: undefined};
+
+  const {name, minEmployees, maxEmployees} = queryData;
+
+  if (parseInt(minEmployees) > parseInt(maxEmployees)) {
+    throw new BadRequestError("minEmployees cannot be greater than maxEmployees!");
+  }
+
+  const clauseArray = [];
+  let idx = 1;
+  
+  //generate appropriate statement based on filter requested, push to array:
+  for (let key in queryData) {
+    if (key === 'name') {
+      clauseArray.push(`name ILIKE $${idx}`);
+      idx++;
+    }
+    if (key === 'minEmployees') {
+      clauseArray.push(`num_employees > $${idx}`);
+      idx++;
+    }
+    if (key === 'maxEmployees') {
+      clauseArray.push(`num_employees < $${idx}`); 
+      idx++;
+    }
+  }
+
+  //add wildcards to value at name key, if present:
+  if (queryData.name) queryData.name = `%${name}%`;
+  
+
+  //join WHERE clause from array of strings and 
+  //return object with clause and cooresponding values:
+  return {
+    whereClause: `WHERE ${clauseArray.join(' AND ')}`,
+    values: Object.values(queryData),
+  }
+
+}
+
+
+
+module.exports = { sqlForPartialUpdate, sqlForCompanyFilter };

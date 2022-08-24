@@ -51,11 +51,10 @@ router.post("/", ensureLoggedIn, async function (req, res, next) {
  */
 
 router.get("/", async function (req, res, next) {
-  //grab query params pass to findAll()
-  //keys/values, keys would be column names and
-  //where clause changes depending on filter
-  const companies = await Company.findAll();
+
+  const companies = await Company.findAll(req.query);
   return res.json({ companies });
+
 });
 
 /** GET /[handle]  =>  { company }
