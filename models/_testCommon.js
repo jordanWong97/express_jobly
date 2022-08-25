@@ -3,7 +3,7 @@ const bcrypt = require("bcrypt");
 const db = require("../db.js");
 const { BCRYPT_WORK_FACTOR } = require("../config");
 
-let idList;
+let idList = [];
 
 async function commonBeforeAll() {
   // noinspection SqlWithoutWhere
@@ -31,12 +31,12 @@ async function commonBeforeAll() {
       await bcrypt.hash("password2", BCRYPT_WORK_FACTOR),
     ]);
 
-  idList = await db.query(`
+  idList.push(await db.query(`
   INSERT INTO jobs(title, salary, equity, company_handle)
   VALUES ('test1', 10000, .005, 'c1'),
           ('test2', 20000, .075, 'c2'),
           ('test3', 30000, .025, 'c1')
-  RETURNING id`);
+  RETURNING id`));
 
 }
 
