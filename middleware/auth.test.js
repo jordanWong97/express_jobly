@@ -5,6 +5,8 @@ const { UnauthorizedError } = require("../expressError");
 const {
   authenticateJWT,
   ensureLoggedIn,
+  ensureAdmin,
+  ensureAdminOrMatchingUser
 } = require("./auth");
 
 
@@ -78,8 +80,6 @@ describe("ensureLoggedIn", function () {
 
 });
 
-//TODO: unit tests for ensureadmin
-
 describe("ensureAdmin", function () {
   test("works", function () {
     expect.assertions(1);
@@ -88,7 +88,7 @@ describe("ensureAdmin", function () {
     const next = function (err) {
       expect(err).toBeFalsy();
     };
-    ensureLoggedIn(req, res, next);
+    ensureAdmin(req, res, next);
   });
 
   test("unauth if not admin", function () {
@@ -98,9 +98,9 @@ describe("ensureAdmin", function () {
     const next = function (err) {
       expect(err instanceof UnauthorizedError).toBeTruthy();
     };
-    ensureLoggedIn(req, res, next);
+    ensureAdmin(req, res, next);
   });
 
 });
 
-  //unit tests for userandadmin
+  //TODO: unit tests for userandadmin
