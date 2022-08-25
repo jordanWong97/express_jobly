@@ -52,10 +52,32 @@ router.post("/", ensureLoggedIn, async function (req, res, next) {
  */
 
 router.get("/", async function (req, res, next) {
-  
-  //TODO: how to convert strings of nums to nums before validation?
-  //FIXME:
-  if (parseInt(minEmployees) > parseInt(maxEmployees)) {
+  // const q = req.query
+  // if(q.minEmployees){
+  //   //minemployees = Num(q.minemployees)
+  // }
+  //neither, default empty obj
+  //pass one, parseInt on undef = false
+  //pass both, both nums ok, or one is false
+
+  // function validateQuery(req) {
+
+  //   let { minEmployees, maxEmployees } = req;
+  //   if (minEmployees !== undefined) {
+  //     if (isNaN(parseInt(minEmployees))) {
+  //       throw new BadRequestError('Must be an integer');
+  //     }
+  //     minEmployees = parseInt(minEmployees);
+  //   }
+  //   if (maxEmployees !== undefined) {
+  //     if (isNaN(parseInt(maxEmployees))) {
+  //       throw new BadRequestError('Must be an integer');
+  //     }
+  //     maxEmployees = parseInt(maxEmployees);
+  //   }
+  // }
+
+  if (parseInt(req.query.minEmployees) > parseInt(req.query.maxEmployees)) {
     throw new BadRequestError("minEmployees cannot be greater than maxEmployees!");
   }
 
@@ -70,7 +92,10 @@ router.get("/", async function (req, res, next) {
   const companies = await Company.findAll(req.query);
   return res.json({ companies });
 
+
 });
+
+
 
 /** GET /[handle]  =>  { company }
  *

@@ -96,9 +96,19 @@ describe("GET /companies", function () {
     });
   });
 
-  //TODO: update .get().query();
+  test("invalid: min is greater than max", async function () {
+    try {
+      // await Company.findAll({ minEmployees: 10, maxEmployees: 5 });
+      const response = await request(app)
+        .get("/companies")
+        .query({ minEmployees: 10, maxEmployees: 5 });
+    } catch (err) {
+      expect(err instanceof BadRequestError).toBeTruthy();
+    }
+  });
+
   test("valid query keys for filter", async function () {
-    const resp = await request(app).get("/companies?nameLike=C2");
+    const resp = await request(app).get("/companies").query({ nameLike: 'C2' });
     expect(resp.body).toEqual({
       companies: [{
         handle: "c2",
@@ -112,7 +122,7 @@ describe("GET /companies", function () {
   });
 
   test("invalid query keys for filter", async function () {
-    const resp = await request(app).get("/companies?username=C2");
+    const resp = await request(app).get("/companies").query({ username: 'C2' });;
     expect(resp.status).toEqual(400);
     expect(resp.body.error).toBeTruthy();
   });

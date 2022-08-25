@@ -2,7 +2,7 @@
 
 const db = require("../db");
 const { BadRequestError, NotFoundError } = require("../expressError");
-const { sqlForPartialUpdate, sqlForCompanyFilter } = require("../helpers/sql");
+const { sqlForPartialUpdate } = require("../helpers/sql");
 
 /** Related functions for companies. */
 
@@ -55,9 +55,9 @@ class Company {
    * Returns [{ handle, name, description, numEmployees, logoUrl }, ...]
    * */
 
-  static async findAll(queryData={}) {
+  static async findAll(queryData = {}) {
 
-    const { whereClause, values } = sqlForCompanyFilter(queryData);
+    const { whereClause, values } = Company._sqlForCompanyFilter(queryData);
 
     const querySql = `SELECT handle,
                               name,
@@ -66,7 +66,7 @@ class Company {
                               logo_url AS "logoUrl"
                           FROM companies
                           ${whereClause}
-                          ORDER BY name`
+                          ORDER BY name`;
 
     const companiesRes = await db.query(querySql, values);
     return companiesRes.rows;
@@ -149,6 +149,55 @@ class Company {
 
     if (!company) throw new NotFoundError(`No company: ${handle}`);
   }
+
+  /** Generates SQL query based on filter parameters from query string.
+ *
+ * If no query string was provided in original request, returns object
+ * which will produce empty string in resulting SQL query.
+ *
+ * If query string was provided, returns object containing a string to be inserted
+ * into SQL query and array of values :
+ * { whereClause: `WHERE ...`, values: [nameLike, minEmployees, maxEmployees] }
+ *
+ * */
+
+  static _sqlForCompanyFilter(queryData) {
+
+    const keys = Object.keys(queryData);
+    if (keys.length === 0) return { whereClause: '', values: undefined };
+
+    const { nameLike, minEmployees, maxEmployees } = queryData;
+
+    const clauseArray = [];
+    let idx = 1;
+
+    //generate appropriate statement based on filter requested, push to array:
+    if (nameLike !== undefined) {
+      clauseArray.push(`name ILIKE $${idx}`);
+      idx++;
+    }
+    if (minEmployees !== undefined) {
+      clauseArray.push(`num_employees >= $${idx}`);
+      idx++;
+    }
+    if (maxEmployees !== undefined) {
+      clauseArray.push(`num_employees <= $${idx}`);
+      idx++;
+    }
+
+    //add wildcards to value at nameLike key, if present:
+    if (queryData.nameLike) queryData.nameLike = `%${nameLike}%`;
+
+    //join WHERE clause from array of strings and
+    //return object with clause and cooresponding values:
+    return {
+      whereClause: `WHERE ${clauseArray.join(' AND ')}`,
+      values: Object.values(queryData),
+    };
+
+  }
+
+
 }
 
 

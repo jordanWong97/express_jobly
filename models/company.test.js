@@ -144,18 +144,6 @@ describe("findAll", function () {
     }]);
   });
 
-  //TODO: move to routes
-  test("invalid: min is greater than max", async function () {
-    try {
-      await Company.findAll({ minEmployees: 10, maxEmployees: 5 });
-    } catch (err) {
-      expect(err instanceof BadRequestError).toBeTruthy();
-    }
-  });
-
-
-
-
 });
 
 /************************************** get */
