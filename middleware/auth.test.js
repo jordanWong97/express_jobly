@@ -103,4 +103,36 @@ describe("ensureAdmin", function () {
 
 });
 
-  //TODO: unit tests for userandadmin
+
+describe("ensureAdminOrMatchingUser", function () {
+  test("works for admin", function () {
+    expect.assertions(1);
+    const req = { params: { username: "test2"}};
+    const res = { locals: { user: { username: "test", isAdmin: true } } };
+    const next = function (err) {
+      expect(err).toBeFalsy();
+    };
+    ensureAdminOrMatchingUser(req, res, next);
+  });
+  
+  test("works for matching user", function () {
+    expect.assertions(1);
+    const req = { params: { username: "test"}};
+    const res = { locals: { user: { username: "test", isAdmin: false } } };
+    const next = function (err) {
+      expect(err).toBeFalsy();
+    };
+    ensureAdminOrMatchingUser(req, res, next);
+  });
+
+  test("unauth if not admin or matching user", function () {
+    expect.assertions(1);
+    const req = { params: { username: "test2"}};
+    const res = { locals: { user: { username: "test", isAdmin: false } } };
+    const next = function (err) {
+      expect(err instanceof UnauthorizedError).toBeTruthy();
+    };
+    ensureAdminOrMatchingUser(req, res, next);
+  });
+
+});

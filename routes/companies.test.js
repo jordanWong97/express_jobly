@@ -49,7 +49,7 @@ describe("POST /companies", function () {
     expect(resp.statusCode).toEqual(401);
     expect(resp.body).toEqual({
       error: {
-      message: "Unauthorized",
+      message: "Must be admin",
       status: 401,
       }
     });
