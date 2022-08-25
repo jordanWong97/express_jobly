@@ -52,44 +52,28 @@ router.post("/", ensureLoggedIn, ensureAdmin, async function (req, res, next) {
  */
 
 router.get("/", async function (req, res, next) {
-  // const q = req.query
-  // if(q.minEmployees){
-  //   //minemployees = Num(q.minemployees)
-  // }
-  //neither, default empty obj
-  //pass one, parseInt on undef = false
-  //pass both, both nums ok, or one is false
 
-  // function validateQuery(req) {
+  const queryData = req.query;
+  if (queryData.minEmployees) {
+    queryData.minEmployees = Num(queryData.minEmployees);
+  }
+  if (queryData.maxEmployees) {
+    queryData.maxEmployees = Num(queryData.maxEmployees);
+  }
 
-  //   let { minEmployees, maxEmployees } = req;
-  //   if (minEmployees !== undefined) {
-  //     if (isNaN(parseInt(minEmployees))) {
-  //       throw new BadRequestError('Must be an integer');
-  //     }
-  //     minEmployees = parseInt(minEmployees);
-  //   }
-  //   if (maxEmployees !== undefined) {
-  //     if (isNaN(parseInt(maxEmployees))) {
-  //       throw new BadRequestError('Must be an integer');
-  //     }
-  //     maxEmployees = parseInt(maxEmployees);
-  //   }
-  // }
-
-  // if (parseInt(req.query.minEmployees) > parseInt(req.query.maxEmployees)) {
-  //   throw new BadRequestError("minEmployees cannot be greater than maxEmployees!");
-  // }
+  if (queryData.minEmployees > queryData.maxEmployees) {
+    throw new BadRequestError("minEmployees cannot be greater than maxEmployees!");
+  }
 
   const result = jsonschema.validate(
-    req.query, companyFilterSchema, { required: true });
+    queryData, companyFilterSchema, { required: true });
 
   if (!result.valid) {
     const errs = result.errors.map(err => err.stack);
     throw new BadRequestError(errs);
   }
 
-  const companies = await Company.findAll(req.query);
+  const companies = await Company.findAll(queryData);
   return res.json({ companies });
 
 
