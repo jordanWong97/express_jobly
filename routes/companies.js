@@ -55,10 +55,10 @@ router.get("/", async function (req, res, next) {
 
   const queryData = req.query;
   if (queryData.minEmployees) {
-    queryData.minEmployees = Num(queryData.minEmployees);
+    queryData.minEmployees = Number(queryData.minEmployees);
   }
   if (queryData.maxEmployees) {
-    queryData.maxEmployees = Num(queryData.maxEmployees);
+    queryData.maxEmployees = Number(queryData.maxEmployees);
   }
 
   if (queryData.minEmployees > queryData.maxEmployees) {

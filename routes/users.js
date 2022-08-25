@@ -5,7 +5,8 @@
 const jsonschema = require("jsonschema");
 
 const express = require("express");
-const { ensureLoggedIn, ensureAdmin } = require("../middleware/auth");
+const { ensureLoggedIn, ensureAdmin, ensureAdminOrMatchingUser } =
+  require("../middleware/auth");
 const { BadRequestError, UnauthorizedError } = require("../expressError");
 const User = require("../models/user");
 const { createToken } = require("../helpers/tokens");
@@ -24,10 +25,10 @@ const router = express.Router();
  * This returns the newly created user and an authentication token for them:
  *  {user: { username, firstName, lastName, email, isAdmin }, token }
  *
- * Authorization required: login
+ * Authorization required: admin
  **/
 
-router.post("/", ensureLoggedIn, ensureAdmin, async function (req, res, next) {
+router.post("/", ensureAdmin, async function (req, res, next) {
   const validator = jsonschema.validate(
     req.body,
     userNewSchema,
@@ -48,10 +49,10 @@ router.post("/", ensureLoggedIn, ensureAdmin, async function (req, res, next) {
  *
  * Returns list of all users.
  *
- * Authorization required: login
+ * Authorization required: admin
  **/
 
-router.get("/", ensureLoggedIn, ensureAdmin, async function (req, res, next) {
+router.get("/", ensureAdmin, async function (req, res, next) {
   const users = await User.findAll();
   return res.json({ users });
 });
@@ -61,17 +62,14 @@ router.get("/", ensureLoggedIn, ensureAdmin, async function (req, res, next) {
  *
  * Returns { username, firstName, lastName, isAdmin }
  *
- * Authorization required: login
+ * Authorization required: admin or same user
  **/
 
-router.get("/:username", ensureLoggedIn, async function (req, res, next) {
-  if (res.locals.user.username === req.params.username ||
-    res.locals.user.isAdmin === true) {
-    const user = await User.get(req.params.username);
-    return res.json({ user });
-  } else {
-    throw new UnauthorizedError('User is not authorized');
-  }
+router.get("/:username", ensureAdminOrMatchingUser, async function (req, res, next) {
+
+  const user = await User.get(req.params.username);
+  return res.json({ user });
+
 });
 
 
@@ -82,44 +80,37 @@ router.get("/:username", ensureLoggedIn, async function (req, res, next) {
  *
  * Returns { username, firstName, lastName, email, isAdmin }
  *
- * Authorization required: login
+ * Authorization required: admin or same user
  **/
 
-router.patch("/:username", ensureLoggedIn, async function (req, res, next) {
-  if (res.locals.user.username === req.params.username ||
-    res.locals.user.isAdmin === true) {
-    const validator = jsonschema.validate(
-      req.body,
-      userUpdateSchema,
-      { required: true }
-    );
-    if (!validator.valid) {
-      const errs = validator.errors.map(e => e.stack);
-      throw new BadRequestError(errs);
-    }
+router.patch("/:username", ensureAdminOrMatchingUser, async function (req, res, next) {
 
-    const user = await User.update(req.params.username, req.body);
-    return res.json({ user });
-  } else {
-    throw new UnauthorizedError('User is not authorized');
+  const validator = jsonschema.validate(
+    req.body,
+    userUpdateSchema,
+    { required: true }
+  );
+  if (!validator.valid) {
+    const errs = validator.errors.map(e => e.stack);
+    throw new BadRequestError(errs);
   }
+
+  const user = await User.update(req.params.username, req.body);
+  return res.json({ user });
+
 
 });
 
 
 /** DELETE /[username]  =>  { deleted: username }
  *
- * Authorization required: login
+ * Authorization required: admin or same user
  **/
 
-router.delete("/:username", ensureLoggedIn, async function (req, res, next) {
-  if (res.locals.user.username === req.params.username ||
-    res.locals.user.isAdmin === true) {
-    await User.remove(req.params.username);
-    return res.json({ deleted: req.params.username });
-  } else {
-    throw new UnauthorizedError('User is not authorized');
-  }
+router.delete("/:username", ensureAdminOrMatchingUser, async function (req, res, next) {
+
+  await User.remove(req.params.username);
+  return res.json({ deleted: req.params.username });
 
 });
 

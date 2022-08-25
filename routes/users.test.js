@@ -180,7 +180,6 @@ describe("GET /users", function () {
     expect(resp.statusCode).toEqual(401);
   });
 
-  //TODO:what is this test
   test("fails: test next() handler", async function () {
     // there's no normal failure event which will cause this route to fail ---
     // thus making it hard to test that the error-handler works with it. This
