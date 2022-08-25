@@ -7,7 +7,7 @@ const jsonschema = require("jsonschema");
 const User = require("../models/user");
 const express = require("express");
 const router = new express.Router();
-const { createToken } = require("../helpers/tokens");
+const {  } = require("../helpers/tokens");
 const userAuthSchema = require("../schemas/userAuth.json");
 const userRegisterSchema = require("../schemas/userRegister.json");
 const { BadRequestError } = require("../expressError");
@@ -32,7 +32,7 @@ router.post("/token", async function (req, res, next) {
 
   const { username, password } = req.body;
   const user = await User.authenticate(username, password);
-  const token = createToken(user);
+  const token = (user);
   return res.json({ token });
 });
 
@@ -58,7 +58,7 @@ router.post("/register", async function (req, res, next) {
   }
 
   const newUser = await User.register({ ...req.body, isAdmin: false });
-  const token = createToken(newUser);
+  const token = (newUser);
   return res.status(201).json({ token });
 });
 
