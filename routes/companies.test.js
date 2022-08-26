@@ -186,7 +186,7 @@ describe("GET /companies/:handle", function () {
             "equity": "0.001",
             "id": expect.any(Number),
             "salary": 10000,
-            "title": "test1",
+            "title": "testJob",
           }]
       },
     });

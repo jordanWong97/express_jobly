@@ -116,7 +116,7 @@ describe("GET /jobs", function () {
             title: "testJob2",
             salary: 20000,
             equity: "0.002",
-            company_handle: "c2"
+            company_handle: "c3"
           },
           {
             id: expect.any(Number),
@@ -141,38 +141,42 @@ describe("GET /jobs", function () {
 
   test("valid single query key for filter", async function () {
     const resp = await request(app)
-          .get("/jobs")
-          .query({ titleLike: 'testJob3' });
-    expect(resp.body).toEqual({jobs: [{
-      id: expect.any(Number),
-      title: "testJob3",
-      salary: 30000,
-      equity: "0.003",
-      company_handle: "c3"
-    }]
+      .get("/jobs")
+      .query({ titleLike: 'testJob3' });
+    expect(resp.body).toEqual({
+      jobs: [{
+        id: expect.any(Number),
+        title: "testJob3",
+        salary: 30000,
+        equity: "0.003",
+        company_handle: "c3"
+      }]
     });
   });
 
   test("valid all query keys for filter", async function () {
     const resp = await request(app)
-          .get("/jobs")
-          .query({ titleLike: 'testJob3',
-                  minSalary: 1,
-                  hasEquity: true});
-    expect(resp.body).toEqual({jobs: [{
-      id: expect.any(Number),
-      title: "testJob3",
-      salary: 30000,
-      equity: "0.003",
-      company_handle: "c3"
-    }]
+      .get("/jobs")
+      .query({
+        titleLike: 'testJob3',
+        minSalary: 1,
+        hasEquity: true
+      });
+    expect(resp.body).toEqual({
+      jobs: [{
+        id: expect.any(Number),
+        title: "testJob3",
+        salary: 30000,
+        equity: "0.003",
+        company_handle: "c3"
+      }]
     });
   });
 
   test("invalid query keys for filter", async function () {
     const resp = await request(app)
-          .get("/jobs")
-          .query({ username: 'testJob' });;
+      .get("/jobs")
+      .query({ username: 'testJob' });;
     expect(resp.status).toEqual(400);
     expect(resp.body.error).toBeTruthy();
   });
@@ -339,4 +343,4 @@ describe("GET /jobs", function () {
 
   });
 
-})
+});
