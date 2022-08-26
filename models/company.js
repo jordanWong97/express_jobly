@@ -96,21 +96,24 @@ class Company {
               j.equity,
               j.company_handle AS "companyHandle"
            FROM companies AS c
-           RIGHT OUTER JOIN jobs AS j ON j.company_handle = c.handle
+            LEFT OUTER JOIN jobs AS j ON j.company_handle = c.handle
            WHERE c.handle = $1`,
       [handle]);
 
-    console.log('companyres', companyRes);
     const company = companyRes.rows[0];
     if (!company) throw new NotFoundError(`No company: ${handle}`);
 
-    const jobArray = companyRes.rows.map(j => ({
+    let jobArray = [];
+
+    if (companyRes.rows[0].id !== null) {
+    jobArray = companyRes.rows.map(j => ({
       id: j.id,
       title: j.title,
       salary: j.salary,
       equity: j.equity,
       companyHandle: j.companyHandle
     }));
+  }
 
     return {
       handle: company.handle,
