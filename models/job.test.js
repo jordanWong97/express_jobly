@@ -185,11 +185,9 @@ describe("update", function () {
     test("works", async function () {
 
         const id = idList[0].rows[0].id;
-        
+
         let job = await Job.update(id, updateData);
-        
-        console.log(id)
-        console.log(idList[0].rows[0].id)
+
 
         expect(job).toEqual({
             id,
@@ -250,7 +248,7 @@ describe("update", function () {
 
     test("bad request with no data", async function () {
 
-                const id = idList[0].rows[0].id;
+        const id = idList[0].rows[0].id;
 
         try {
             await Job.update(id, {});

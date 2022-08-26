@@ -3,38 +3,41 @@
 const db = require("../db.js");
 const User = require("../models/user");
 const Company = require("../models/company");
+const Job = require("../models/job");
 const { createToken } = require("../helpers/tokens");
+let jobIDList = [];
 
 async function commonBeforeAll() {
   // noinspection SqlWithoutWhere
   await db.query("DELETE FROM users");
   // noinspection SqlWithoutWhere
+  //TODO: do we need to delete jobs?
   await db.query("DELETE FROM companies");
 
   await Company.create(
-      {
-        handle: "c1",
-        name: "C1",
-        numEmployees: 1,
-        description: "Desc1",
-        logoUrl: "http://c1.img",
-      });
+    {
+      handle: "c1",
+      name: "C1",
+      numEmployees: 1,
+      description: "Desc1",
+      logoUrl: "http://c1.img",
+    });
   await Company.create(
-      {
-        handle: "c2",
-        name: "C2",
-        numEmployees: 2,
-        description: "Desc2",
-        logoUrl: "http://c2.img",
-      });
+    {
+      handle: "c2",
+      name: "C2",
+      numEmployees: 2,
+      description: "Desc2",
+      logoUrl: "http://c2.img",
+    });
   await Company.create(
-      {
-        handle: "c3",
-        name: "C3",
-        numEmployees: 3,
-        description: "Desc3",
-        logoUrl: "http://c3.img",
-      });
+    {
+      handle: "c3",
+      name: "C3",
+      numEmployees: 3,
+      description: "Desc3",
+      logoUrl: "http://c3.img",
+    });
 
   await User.register({
     username: "u1",
@@ -68,6 +71,30 @@ async function commonBeforeAll() {
     password: "password4",
     isAdmin: true,
   });
+
+  const job1 = await Job.create(
+    {
+      title: "testJob",
+      salary: 10000,
+      equity: .001,
+      company_handle: "c1"
+    });
+  const job2 = await Job.create(
+    {
+      title: "testJob2",
+      salary: 20000,
+      equity: .002,
+      company_handle: "c2"
+    });
+  const job3 = await Job.create(
+    {
+      title: "testJob3",
+      salary: 30000,
+      equity: .003,
+      company_handle: "c3"
+    });
+
+  jobIDList.push(job1.id, job2.id, job3.id);
 }
 
 async function commonBeforeEach() {
@@ -94,4 +121,5 @@ module.exports = {
   commonAfterAll,
   u1Token,
   u4TokenAdmin,
+  jobIDList
 };

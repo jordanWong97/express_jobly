@@ -9,7 +9,7 @@ class Job {
      *
      * data should be { title, salary, equity, handle }
      *
-     * Returns { title, salary, equity, handle }
+     * Returns { id, title, salary, equity, handle }
      *
      * */
 
@@ -23,7 +23,7 @@ class Job {
             company_handle)
             VALUES
                ($1, $2, $3, $4)
-            RETURNING title, salary, equity, company_handle`,
+            RETURNING id, title, salary, equity, company_handle`,
             [
                 title,
                 salary,
@@ -121,7 +121,7 @@ class Job {
             UPDATE jobs
                 SET ${setCols}
                 WHERE id = ${idVarIdx}
-                RETURNING id, 
+                RETURNING id,
                         title,
                         salary,
                         equity,
