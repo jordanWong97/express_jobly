@@ -47,7 +47,7 @@ class Job {
 
     static async findAll(queryData = {}) {
 
-        //const { whereClause, values } = Company._sqlForCompanyFilter(queryData);
+        const { whereClause, values } = Job._sqlForJobFilter(queryData);
 
         const querySql = `SELECT id,
                                 title,
@@ -55,13 +55,10 @@ class Job {
                                 equity,
                                 company_handle
                             FROM jobs
+                            ${whereClause}
                             ORDER BY id`;
-        //${whereClause}
 
-        const companiesRes = await db.query(querySql);
-
-
-
+        const companiesRes = await db.query(querySql, values);
         return companiesRes.rows;
 
     }
@@ -150,6 +147,56 @@ class Job {
 
         if (!job) throw new NotFoundError(`No job: ${id}`);
     }
+
+  /** Generates SQL query based on filter parameters from query string.
+ *
+ * If no query string was provided in original request, returns object
+ * which will produce empty string in resulting SQL query.
+ *
+ * If query string was provided, returns object containing a string to be inserted
+ * into SQL query and array of values :
+ * { whereClause: `WHERE ...`, values: [nameLike, minEmployees, maxEmployees] }
+ *
+ * */
+
+   static _sqlForJobFilter(queryData) {
+
+    const keys = Object.keys(queryData);
+    if (keys.length === 0) return { whereClause: '', values: undefined };
+
+    const { titleLike, minSalary, hasEquity } = queryData;
+
+    const resultObject = {};
+
+    const clauseArray = [];
+    let idx = 1;
+
+    //generate appropriate statement based on filter requested, push to array:
+    if (titleLike !== undefined) {
+      clauseArray.push(`title ILIKE $${idx}`);
+      resultObject.titleLike = titleLike;
+      idx++;
+    }
+    if (minSalary !== undefined) {
+      clauseArray.push(`salary >= $${idx}`);
+      resultObject.minSalary = minSalary;
+      idx++;
+    }
+    if (hasEquity === true) {
+      clauseArray.push(`equity >= 0`);
+    }
+
+    //add wildcards to value at titleLike key, if present:
+    if (resultObject.titleLike) resultObject.titleLike = `%${titleLike}%`;
+
+    //join WHERE clause from array of strings and
+    //return object with clause and cooresponding values:
+    return {
+      whereClause: `WHERE ${clauseArray.join(' AND ')}`,
+      values: Object.values(resultObject),
+    };
+
+  }
 
 };
 

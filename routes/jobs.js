@@ -11,7 +11,7 @@ const Job = require("../models/job");
 
 const jobNewSchema = require("../schemas/jobNew.json");
 const jobUpdateSchema = require("../schemas/jobUpdate.json");
-//const jobFilterSchema = require("../schemas/jobFilter.json");
+const jobFilterSchema = require("../schemas/jobFilter.json");
 
 const router = new express.Router();
 
@@ -42,7 +42,7 @@ router.post("/", ensureAdmin, async function (req, res, next) {
 
 
 /** GET /  =>
- *   { jobs: [ { title, salary, equity, company_handle }, ...] }
+ *   { jobs: [ { id, title, salary, equity, company_handle }, ...] }
  *
  * Can filter on provided search filters:
  * - title
@@ -54,27 +54,21 @@ router.post("/", ensureAdmin, async function (req, res, next) {
 
 router.get("/", async function (req, res, next) {
 
-  // const queryData = req.query;
-  // if (queryData.minEmployees) {
-  //   queryData.minEmployees = Number(queryData.minEmployees);
-  // }
-  // if (queryData.maxEmployees) {
-  //   queryData.maxEmployees = Number(queryData.maxEmployees);
-  // }
+  const queryData = req.query;
 
-  // if (queryData.minEmployees > queryData.maxEmployees) {
-  //   throw new BadRequestError("minEmployees cannot be greater than maxEmployees!");
-  // }
+  if (queryData.minSalary) {
+    queryData.minSalary = Number(queryData.minSalary);
+  }
 
-  // const result = jsonschema.validate(
-  //   queryData, companyFilterSchema, { required: true });
+  const result = jsonschema.validate(
+    queryData, jobFilterSchema, { required: true });
 
-  // if (!result.valid) {
-  //   const errs = result.errors.map(err => err.stack);
-  //   throw new BadRequestError(errs);
-  // }
-  //queryData
-  const jobs = await Job.findAll();
+  if (!result.valid) {
+    const errs = result.errors.map(err => err.stack);
+    throw new BadRequestError(errs);
+  }
+
+  const jobs = await Job.findAll(queryData);
   return res.json({ jobs });
 
 });

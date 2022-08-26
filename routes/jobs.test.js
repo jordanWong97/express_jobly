@@ -129,44 +129,61 @@ describe("GET /jobs", function () {
     });
   });
 
-  // test("invalid: min is greater than max", async function () {
-  //   try {
-  //     // await Company.findAll({ minEmployees: 10, maxEmployees: 5 });
-  //     const response = await request(app)
-  //       .get("/companies")
-  //       .query({ minEmployees: 10, maxEmployees: 5 });
-  //   } catch (err) {
-  //     expect(err instanceof BadRequestError).toBeTruthy();
-  //   }
-  // });
+  test("invalid: min salary less than zero", async function () {
+    try {
+      const response = await request(app)
+        .get("/jobs")
+        .query({ minSalary: -5 });
+    } catch (err) {
+      expect(err instanceof BadRequestError).toBeTruthy();
+    }
+  });
 
-  // test("valid query keys for filter", async function () {
-  //   const resp = await request(app).get("/companies").query({ nameLike: 'C2' });
-  //   expect(resp.body).toEqual({
-  //     companies: [{
-  //       handle: "c2",
-  //       name: "C2",
-  //       description: "Desc2",
-  //       numEmployees: 2,
-  //       logoUrl: "http://c2.img"
-  //     }]
+  test("valid single query key for filter", async function () {
+    const resp = await request(app)
+          .get("/jobs")
+          .query({ titleLike: 'testJob3' });
+    expect(resp.body).toEqual({jobs: [{
+      id: expect.any(Number),
+      title: "testJob3",
+      salary: 30000,
+      equity: "0.003",
+      company_handle: "c3"
+    }]
+    });
+  });
 
-  //   });
-  // });
+  test("valid all query keys for filter", async function () {
+    const resp = await request(app)
+          .get("/jobs")
+          .query({ titleLike: 'testJob3',
+                  minSalary: 1,
+                  hasEquity: true});
+    expect(resp.body).toEqual({jobs: [{
+      id: expect.any(Number),
+      title: "testJob3",
+      salary: 30000,
+      equity: "0.003",
+      company_handle: "c3"
+    }]
+    });
+  });
 
-  // test("invalid query keys for filter", async function () {
-  //   const resp = await request(app).get("/companies").query({ username: 'C2' });;
-  //   expect(resp.status).toEqual(400);
-  //   expect(resp.body.error).toBeTruthy();
-  // });
+  test("invalid query keys for filter", async function () {
+    const resp = await request(app)
+          .get("/jobs")
+          .query({ username: 'testJob' });;
+    expect(resp.status).toEqual(400);
+    expect(resp.body.error).toBeTruthy();
+  });
 
   test("fails: test next() handler", async function () {
     // there's no normal failure event which will cause this route to fail ---
     // thus making it hard to test that the error-handler works with it. This
     // should cause an error, all right :)
-    await db.query("DROP TABLE companies CASCADE");
+    await db.query("DROP TABLE jobs CASCADE");
     const resp = await request(app)
-      .get("/companies")
+      .get("/jobs")
       .set("authorization", `Bearer ${u1Token}`);
     expect(resp.statusCode).toEqual(500);
   });
