@@ -38,6 +38,7 @@ describe("create", function () {
              WHERE company_handle = 'c3'`);
         expect(result.rows).toEqual([
             {
+                
                 title: "newJob",
                 salary: 10000,
                 equity: "0.123",

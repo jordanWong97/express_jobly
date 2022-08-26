@@ -40,7 +40,7 @@ describe("POST /companies", function () {
       company: newCompany,
     });
   });
-  
+
   test("unauth for users", async function () {
     const resp = await request(app)
       .post("/companies")
@@ -49,8 +49,8 @@ describe("POST /companies", function () {
     expect(resp.statusCode).toEqual(401);
     expect(resp.body).toEqual({
       error: {
-      message: "Must be admin",
-      status: 401,
+        message: "Must be admin",
+        status: 401,
       }
     });
   });
@@ -62,8 +62,8 @@ describe("POST /companies", function () {
     expect(resp.statusCode).toEqual(401);
     expect(resp.body).toEqual({
       error: {
-      message: "Unauthorized",
-      status: 401,
+        message: "Unauthorized",
+        status: 401,
       }
     });
   });
@@ -180,6 +180,14 @@ describe("GET /companies/:handle", function () {
         description: "Desc1",
         numEmployees: 1,
         logoUrl: "http://c1.img",
+        jobs: [
+          {
+            "companyHandle": "c1",
+            "equity": "0.001",
+            "id": expect.any(Number),
+            "salary": 10000,
+            "title": "test1",
+          }]
       },
     });
   });
@@ -193,6 +201,7 @@ describe("GET /companies/:handle", function () {
         description: "Desc2",
         numEmployees: 2,
         logoUrl: "http://c2.img",
+        jobs: [],
       },
     });
   });
@@ -232,7 +241,7 @@ describe("PATCH /companies/:handle", function () {
       });
     expect(resp.statusCode).toEqual(401);
   });
-  
+
   test("unauth for non-admin user", async function () {
     const resp = await request(app)
       .patch(`/companies/c1`)
@@ -283,7 +292,7 @@ describe("DELETE /companies/:handle", function () {
       .set("authorization", `Bearer ${u4TokenAdmin}`);
     expect(resp.body).toEqual({ deleted: "c1" });
   });
-    
+
   test("unauth for anon", async function () {
     const resp = await request(app)
       .delete(`/companies/c1`);
@@ -303,5 +312,5 @@ describe("DELETE /companies/:handle", function () {
       .set("authorization", `Bearer ${u4TokenAdmin}`);
     expect(resp.statusCode).toEqual(404);
   });
-  
+
 });
